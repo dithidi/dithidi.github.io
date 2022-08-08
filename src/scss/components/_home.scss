@@ -1,0 +1,64 @@
+@use '../mixins/_media-query' as *;
+
+.home-container {
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    width: 100%;
+}
+
+.home-logo-container {
+    display: flex;
+    margin-bottom: 2rem;
+
+    @include devices(mobile) {
+        align-items: center;
+        flex-direction: column;
+    }
+}
+
+.home-logo {
+    margin-bottom: 1rem;
+    margin-right: 1.5rem;
+    max-width: 200px;
+    width: 100%;
+}
+
+.home-blurb {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 300px;
+    width: 100%;
+
+    @include devices(mobile) {
+        max-width: 100%;
+    }
+
+    p:first-child {
+        color: var(--main-color);
+        font-size: 1.7rem;
+        font-weight: 700;
+    }
+
+    p:nth-child(2) {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+        margin-right: -25px;
+
+        @include devices(mobile) {
+            margin-right: 0;
+        }
+    }
+
+    p:last-child {
+        color: var(--secondary-color);
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+}
+
+.home-blurb * {
+    font-family: 'Orbitron', sans-serif;
+}

@@ -1,0 +1,103 @@
+---
+tags: post
+layout: post
+title: "A Case for Another Framework: (Part 3) The Application Class"
+date: 2022-07-04
+formattedDate: July 2nd 2022
+---
+<section class="page-content__subsect">
+    <h2 class="page-content__subsect-title">introduction</h2>
+
+    <div class="page-content__sebsect-content">
+        <p>As introduced (<a href="/portfolio/a_case_for_a_new_framework/">here</a>), I will be walking through my process and reasonings behind those processes for creating my own PHP framework. The attempt is to create code that's easy to read, debug and dive into without needing a lengthy manual. The hope of this project is to not only increase my knowledge of PHP development, but to also create a viable framework that puts speed, security and functionality above syntactic sugar. In this post, we'll be going over the front controller and overall Application class setup. I'll walk you through how I'm instantiating the "app" and how the Application class boots up to store all of the data and functionality needed to run the application code. I give you, the "Nebula" framework. I know there are already frameworks of various code out there that is using the "Nebula" name but hey, I like physics and I'm not marketing this thing.</p>
+    </div>
+</section>
+
+<div class="page__left-divider"></div>
+
+<h3 class="post__sub-heading">The Application Class (continued)</h3>
+
+<div class="page-columns">
+    <p>We last left off by looking at the front controller, and how it instantiates the Application class and returns the response in order to supply the end user with the desired content. We then started taking a deep dive into the Application class itself and some of the steps it takes while booting up. Here, we will round off the Application class discussion by looing at the remainder of the constructor method at a high level. Most of the things going on from here on out are very class specific, and the Application class simply serves as a 'manager' of sorts. With that being the case, we'll leave in-depth discussions of those classes to future entries so we can fully understand what they are doing. I posted the Application class code in the previous post <a href="/portfolio/a_case_for_a_new_framework_part_2" target="_blank">here</a>, but you can also check out the source code <a href="https://github.com/dithidi/nebula_php_framework/blob/main/src/Nebula/Application.php" target="_blank">here</a>. Feel free to have a look at the code in it's entirety.</p>
+</div>
+
+<p>Let's continue the Application class discussion by looking at the following code block:</p>
+
+<pre>
+    <code>
+    // Get configuration
+    if (file_exists(storage_path('framework/cache/config.json'))) {
+        // Get config directly from JSON file if present
+        $appConfig = json_decode(file_get_contents(storage_path('framework/cache/config.json')), true);
+
+        if (!defined('CONFIG_CACHE')) {
+            define('CONFIG_CACHE', true);
+        }
+    } else {
+        // Initialize env handler
+        $dotenv = new Dotenv();
+        $dotenv->load(base_path('.env'));
+
+        if (!defined('CONFIG_CACHE')) {
+            define('CONFIG_CACHE', false);
+        }
+
+        $appConfig = include(base_path('config/config.php'));
+    }
+
+    if ($isConsoleApp) {
+        // Set runningInConsole flag to true
+        $appConfig['runningInConsole'] = true;
+    }
+
+    $this->config = $appConfig;
+    </code>
+</pre>
+
+<p>This is the application code that stores all of the configuration values for global use. As you'll notice, the first if block allows the configuration file to be a pre-compiled json file that already contains a full listing of the app environment's variables. This is a great thing because it allows a file caching system for the config where an .env file does not have to be processed on every page load. This can have huge benefits depending on how many configuration files your app has.</p>
+
+<p>On the flip side of this code down in the else, the Application class is falling back to directly reading from the .env file supplied at the application root. The .env variables will be populated into all of the configuration files and that data is then saved to the Application class. This method has its drawbacks because an overuse of the <code class="inline-code">env()</code> method could cause a slight application slowdown.</p>
+
+<p>I have a built-in CLI command that caches the configuration into a flat .json file. The command is <code class="inline-code">php fusion config:cache</code> (more on the Nebula CLI later).</p>
+
+<h3 class="post__sub-heading">The Remaining Bits</h3>
+
+<p>There is only one section left for the Application's constructor method and on the surface it's quite simple: so let's leave the explanation simple.</p>
+
+<pre>
+    <code>
+    // Register App class instances
+    $this->classes[Logger::class] = new Logger($this->config['logging']);
+    $this->classes[ExceptionHandler::class] = new ExceptionHandler($this->classes[Logger::class]);
+    $this->classes[Validator::class] = new Validator();
+
+    // Initialize the database connection manager and query builder
+    $this->classes[DatabaseManager::class] = new DatabaseManager();
+    $this->classes[QueryBuilder::class] = new QueryBuilder($this->classes[DatabaseManager::class]->getPdo());
+
+    // Initialize the Session Manager
+    $this->classes[SessionManager::class] = new SessionManager($this->config['session'], $this->classes[DatabaseManager::class]->getPdo());
+
+    // Initialize the Auth Manager
+    $this->classes[AuthManager::class] = new AuthManager($this->config['auth'], $this->classes[DatabaseManager::class]->getPdo());
+
+    $this->classes[HttpKernel::class] = new HttpKernel();
+    $this->classes[Router::class] = new Router();
+    $this->classes[RequestResolver::class] = new RequestResolver();
+    $this->classes[Response::class] = new Response();
+
+    // Start the Cache Manager
+    $this->classes[CacheManager::class] = new CacheManager($this->config['cache']);
+
+    // Build the routes
+    $this->classes[Router::class]->buildRoutes();
+    </code>
+</pre>
+
+<div class="page-columns margin-b--m">
+    <p>All we need to understand here is that the Application class is instantiating all of the necessary classes to make it tick, and stores them as an accessible class variable for later use. I've decided to take an EXTREMELY simple approach to programming this framework. Not because I'm not capable of abstracting the ever living out of it, but because the answer to "why" do those things doesn't make sense to me. Abstracting code only makes it a) more difficult to read as a human and b) make it a daunting task to just dive right in to fix something small. There's also a (c) reasoning here: abstracting sometimes makes things slow. When I look at the stack trace of a random error of some of the frameworks that are widely being used, I notice a trend. The stack traces are sometimes 60+ lines long! That means that the code had to jump through 60+ hoops to make something happen. Why do we do this to ourselves!?</p>
+
+    <p>I have a lot of experience messing around with game design (programming). There is a concept of having 'managers' for things. You'll have a GameManager as a base class that controls the global aspects of the game, a PlayerManager, and so on. I've sort of designed this framework to mimic some of those guidelines. It makes sense to me to compartmentalize code in this way and have these 'managers' taking care of their own business. As we continue the walk through my Nebula framework, you'll see many examples of how the end result oftentimes resembles Laravel code at an outwardly facing value. However I've completely changed the backend to how these things are accomplished. We'll continue that trend but will also deviate from that as we progress and I started taking more of a liberal approach. That's because my frame of mind changed as I was developing this framework. At first, I thought it might be cool to have a direct 1 to 1 comparison of the code and to maybe even sneak Nebula into my workplace at some point by just simply replacing Laravel. However, as I went on, I realized that I actually liked my framework and started coding things to make more sense to me. This means I started taking out a lot of syntactic sugar in places I didn't feel like it had a benefit to the developer. I did this a lot actually.</p>
+</div>
+
+<p>You can check out the framework here: <a href="https://github.com/dithidi/nebula_php_framework" target="_blank">https://github.com/dithidi/nebula_php_framework</a></p>

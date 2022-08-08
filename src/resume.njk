@@ -1,0 +1,65 @@
+---
+layout: main
+subtitle: " - resume"
+activeLink: "resume"
+---
+<h1 class="page-heading">
+    $ cat ./resume
+</h1>
+
+<section class="page-content fs--m">
+    <section class="page-content__subsect">
+        <h2 class="page-content__subsect-title">job history</h2>
+
+        <div class="page-content__sebsect-content">
+            <ul class="resume__list">
+                {% for job in jobs %}
+                    <li>
+                        <h3 class="resume__company">{{ job.company }}</h3>
+
+                        {% for jobtitle in job.titles %}
+                            <div class="resume__title">{{ jobtitle.title }} ({{ jobtitle.from }} - {{ jobtitle.to }})</div>
+                        {% endfor %}
+
+                        <p class="resume__description">
+                            {{ job.description }}
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+
+    <div class="resume-divider"></div>
+
+    <section class="page-content__subsect">
+        <h2 class="page-content__subsect-title">education</h2>
+
+        <div class="page-content__sebsect-content">
+            <ul class="resume__list">
+                {% for school in schools %}
+                    <li class="margin-b--m">
+                        <h3 class="resume__company">{{ school.name }}</h3>
+                        <div class="resume__title">{{ school.degree }} ({{ school.date }})</div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+
+    <div class="resume-divider"></div>
+
+    <section class="page-content__subsect">
+        <h2 class="page-content__subsect-title">skills and tech</h2>
+
+        <div class="page-content__sebsect-content">
+            <ul class="resume__skills-list">
+                {% for skill in skills %}
+                    <li class="margin-b--s resume__skill">
+                        <div class="resume__title">{{ skill }}</div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+</section>

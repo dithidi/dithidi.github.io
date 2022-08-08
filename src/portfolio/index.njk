@@ -1,0 +1,25 @@
+---
+layout: main
+subtitle: " - portfolio"
+activeLink: "portfolio"
+---
+<h1 class="page-heading">
+    $ cat ./portfolio
+</h1>
+
+<section class="page-content fs--m">
+    <p>I've decided to do things a little differently on my portfolio page than what is considered "the norm". Instead of a laundry list of things I've accomplished with links going off into all reaches of the interrealm, I'm going to be approaching this as a type of blog. "Why?", you ask? I feel like a portfolio is generally useless if you don't really understand the meaning behind the work. Being able to go through the thought process and logic behind development decisions is the bread and butter of these types of pages (in my opinion) and so I bring that to you.</p>
+
+    <section class="page-content__subsect">
+        <h2 class="page-content__subsect-title">entries</h2>
+
+        <ul class="post-list">
+            {% for post in collections.post | reverse %}
+                <li class="margin-b--m">
+                    <a class="post-link" href="{{ post.url }}">{{ post.data.title }}</a>
+                    <span class="post-link__meta">{{ post.data.formattedDate }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+</section>

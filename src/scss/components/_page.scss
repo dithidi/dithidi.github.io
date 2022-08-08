@@ -1,0 +1,134 @@
+@use '../mixins/_media-query' as *;
+
+.page-heading {
+    color: var(--main-color);
+    font-family: 'Press Start 2P', cursive;
+    margin-bottom: 3rem;
+
+    @include devices(mobile) {
+        font-size: 1.3rem;
+        margin-bottom: 2rem;
+    }
+}
+
+.page-meta__title {
+    color: var(--secondary-color);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.4rem;
+
+    @include devices(mobile) {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+}
+
+.page-meta__date {
+    font-size: 1rem;
+    font-style: italic;
+}
+
+.page-content {
+    display: block;
+    margin-bottom: 4rem;
+
+    @include devices(mobile) {
+        font-size: 1rem;
+    }
+
+    p {
+        margin-bottom: 1.4rem;
+    }
+
+    .pquote {
+        float: right;
+        width: 200px;
+        // background: url(images/openquote.gif) top left no-repeat;
+        color: #030;
+        font-size: 26px;
+        line-height: 0.9;
+        font-style: italic;
+        padding: 13px;
+    }
+
+    blockquote {
+        margin: 0;
+    }
+
+    .pquote p:first-letter {
+        font-size: 39px;
+        font-weight: bold;
+    }
+
+    .strikethrough {
+        color: var(--gray);
+        text-decoration: line-through;
+    }
+}
+
+.page-content__subsect {
+    display: flex;
+    position: relative;
+
+    @include devices(mobile) {
+        display: block;
+    }
+}
+
+.page-content__subsect-title {
+    color: var(--secondary-color);
+    transform-origin: 0 0;
+    transform: rotate(90deg);
+    position: absolute;
+    left: 15px;
+    top: 0;
+
+    @include devices(mobile) {
+        left: 0;
+        margin-bottom: 1rem;
+        position: relative;
+        transform: rotate(0);
+    }
+}
+
+.page-content__sebsect-content {
+    flex: 1;
+    padding-left: 2rem;
+
+    @include devices(mobile) {
+        padding-left: 0;
+    }
+}
+
+.page__right-divider {
+    background-color: var(--secondary-color);
+    border-left: 10px solid var(--main-color);
+    height: 15px;
+    margin: 3rem 0 3rem 60%;
+    width: 70%;
+}
+
+.page__left-divider {
+    background-color: var(--secondary-color);
+    border-right: 10px solid var(--main-color);
+    height: 15px;
+    margin: 3rem 0 3rem -20%;
+    width: 70%;
+}
+
+.page-columns {
+    column-count: 2;
+
+    @include devices(tablet) {
+        column-count: 1;
+    }
+}
+
+.page__prev-next-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+
+    @include devices(tablet) {
+        flex-direction: column;
+    }
+}

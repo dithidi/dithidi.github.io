@@ -1,0 +1,48 @@
+@use '../mixins/_media-query' as *;
+
+.main-header {
+    align-items: baseline;
+    background-color: var(--white);
+    border-radius: 0 0 10px 10px;
+    display: flex;
+    justify-content: space-between;
+    margin: 0 auto 1rem;
+    max-width: 1400px;
+    padding: 1rem;
+    width: 100%;
+
+    @include devices(tablet) {
+        align-items: center;
+
+        .nav {
+            .nav__list li {
+                display: block;
+                margin-right: 0;
+                text-align: right;
+            }
+        }
+    }
+}
+
+.main-header__logo-wrap {
+    align-items: baseline;
+    display: flex;
+
+    @include devices(tablet) {
+        align-items: center;
+    }
+
+    span {
+        color: var(--main-color);
+        font-size: 1.5rem;
+        font-weight: 700;
+
+        @include devices(tablet) {
+            font-size: 1.2rem;
+        }
+
+        span {
+            color: var(--secondary-color);
+        }
+    }
+}
