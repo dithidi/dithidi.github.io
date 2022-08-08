@@ -1,15 +1,44 @@
----
-tags: post
-layout: post
-title: "A Case for Another Framework: (Part 3) The Application Class"
-date: 2022-07-04
-formattedDate: July 2nd 2022
----
-<section class="page-content__subsect">
+<html class="main-html">
+    <head>
+        <title>A Case for Another Framework: (Part 3) The Application Class [object Object]</title>
+        <link rel="stylesheet" href=" /dist/css/app.css" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Press+Start+2P&family=Roboto:ital,wght@0,300;0,400;1,100;1,400&display=swap" rel="stylesheet">
+    </head>
+
+    <body class="main-body">
+        <div class="main-header">
+            <div class="main-header__logo-wrap">
+                <img class="nav-logo" src="/images/logo.png" alt="we are brent logo" />
+                <a href="/"><span>we are <span>brent</span>.</span></a>
+            </div>
+
+            <nav class="nav">
+                <ul class="nav__list">
+                    <li><a class="nav__link " href="/about"><span>about</span></a></li>
+                    <li><a class="nav__link " href="/portfolio"><span>portfolio</span></a></li>
+                    <li><a class="nav__link " href="/resume"><span>resume</span></a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="container main-container">
+            <h1 class="page-heading">
+    $ cat ./portfolio
+</h1>
+
+<div class="page-meta margin-b--m">
+    <p class="page-meta__title">A Case for Another Framework: (Part 3) The Application Class</p>
+    <p class="page-meta__date">Created at: July 2nd 2022</p>
+</div>
+
+<section class="page-content fs--m">
+    <section class="page-content__subsect">
     <h2 class="page-content__subsect-title">introduction</h2>
 
     <div class="page-content__sebsect-content">
-        <p>As introduced (<a href="{{ '/portfolio/a_case_for_a_new_framework/' | url }}">here</a>), I will be walking through my process and reasonings behind those processes for creating my own PHP framework. The attempt is to create code that's easy to read, debug and dive into without needing a lengthy manual. The hope of this project is to not only increase my knowledge of PHP development, but to also create a viable framework that puts speed, security and functionality above syntactic sugar. In this post, we'll be going over the front controller and overall Application class setup. I'll walk you through how I'm instantiating the "app" and how the Application class boots up to store all of the data and functionality needed to run the application code. I give you, the "Nebula" framework. I know there are already frameworks of various code out there that is using the "Nebula" name but hey, I like physics and I'm not marketing this thing.</p>
+        <p>As introduced (<a href="/portfolio/a_case_for_a_new_framework/">here</a>), I will be walking through my process and reasonings behind those processes for creating my own PHP framework. The attempt is to create code that's easy to read, debug and dive into without needing a lengthy manual. The hope of this project is to not only increase my knowledge of PHP development, but to also create a viable framework that puts speed, security and functionality above syntactic sugar. In this post, we'll be going over the front controller and overall Application class setup. I'll walk you through how I'm instantiating the "app" and how the Application class boots up to store all of the data and functionality needed to run the application code. I give you, the "Nebula" framework. I know there are already frameworks of various code out there that is using the "Nebula" name but hey, I like physics and I'm not marketing this thing.</p>
     </div>
 </section>
 
@@ -18,7 +47,7 @@ formattedDate: July 2nd 2022
 <h3 class="post__sub-heading">The Application Class (continued)</h3>
 
 <div class="page-columns">
-    <p>We last left off by looking at the front controller, and how it instantiates the Application class and returns the response in order to supply the end user with the desired content. We then started taking a deep dive into the Application class itself and some of the steps it takes while booting up. Here, we will round off the Application class discussion by looing at the remainder of the constructor method at a high level. Most of the things going on from here on out are very class specific, and the Application class simply serves as a 'manager' of sorts. With that being the case, we'll leave in-depth discussions of those classes to future entries so we can fully understand what they are doing. I posted the Application class code in the previous post <a href="{{ '/portfolio/a_case_for_a_new_framework_part_2' | url }}" target="_blank">here</a>, but you can also check out the source code <a href="https://github.com/dithidi/nebula_php_framework/blob/main/src/Nebula/Application.php" target="_blank">here</a>. Feel free to have a look at the code in it's entirety.</p>
+    <p>We last left off by looking at the front controller, and how it instantiates the Application class and returns the response in order to supply the end user with the desired content. We then started taking a deep dive into the Application class itself and some of the steps it takes while booting up. Here, we will round off the Application class discussion by looing at the remainder of the constructor method at a high level. Most of the things going on from here on out are very class specific, and the Application class simply serves as a 'manager' of sorts. With that being the case, we'll leave in-depth discussions of those classes to future entries so we can fully understand what they are doing. I posted the Application class code in the previous post <a href="/portfolio/a_case_for_a_new_framework_part_2" target="_blank">here</a>, but you can also check out the source code <a href="https://github.com/dithidi/nebula_php_framework/blob/main/src/Nebula/Application.php" target="_blank">here</a>. Feel free to have a look at the code in it's entirety.</p>
 </div>
 
 <p>Let's continue the Application class discussion by looking at the following code block:</p>
@@ -101,3 +130,17 @@ formattedDate: July 2nd 2022
 </div>
 
 <p>You can check out the framework here: <a href="https://github.com/dithidi/nebula_php_framework" target="_blank">https://github.com/dithidi/nebula_php_framework</a></p>
+
+
+    
+    
+
+    <div class="page__prev-next-container">
+        <div>Previous: <a class="post-link" href="/portfolio/a_case_for_a_new_framework_part_2/">A Case for Another Framework: (Part 2) The Application Class</a></div>
+        <div>Next: <a class="post-link" href="/portfolio/a_recipe_cms/">A Recipe CMS: A Practical Framework Example</a></div>
+    </div>
+</section>
+
+        </div>
+    </body>
+</html>

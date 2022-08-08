@@ -1,9 +1,30 @@
----
-layout: main
-subtitle: " - about"
-activeLink: "about"
----
-<h1 class="page-heading">
+<html class="main-html">
+    <head>
+        <title>we are brent.  - about</title>
+        <link rel="stylesheet" href=" /dist/css/app.css" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Press+Start+2P&family=Roboto:ital,wght@0,300;0,400;1,100;1,400&display=swap" rel="stylesheet">
+    </head>
+
+    <body class="main-body">
+        <div class="main-header">
+            <div class="main-header__logo-wrap">
+                <img class="nav-logo" src="/images/logo.png" alt="we are brent logo" />
+                <a href="/"><span>we are <span>brent</span>.</span></a>
+            </div>
+
+            <nav class="nav">
+                <ul class="nav__list">
+                    <li><a class="nav__link active" href="/about"><span>about</span></a></li>
+                    <li><a class="nav__link " href="/portfolio"><span>portfolio</span></a></li>
+                    <li><a class="nav__link " href="/resume"><span>resume</span></a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="container main-container">
+            <h1 class="page-heading">
     $ cat ./about
 </h1>
 
@@ -36,3 +57,7 @@ activeLink: "about"
         </div>
     </section>
 </section>
+
+        </div>
+    </body>
+</html>

@@ -1,15 +1,44 @@
----
-tags: post
-layout: post
-title: "A Case for Another Framework: (Part 2) The Application Class"
-date: 2022-07-02
-formattedDate: July 2nd 2022
----
-<section class="page-content__subsect">
+<html class="main-html">
+    <head>
+        <title>A Case for Another Framework: (Part 2) The Application Class [object Object]</title>
+        <link rel="stylesheet" href=" /dist/css/app.css" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Press+Start+2P&family=Roboto:ital,wght@0,300;0,400;1,100;1,400&display=swap" rel="stylesheet">
+    </head>
+
+    <body class="main-body">
+        <div class="main-header">
+            <div class="main-header__logo-wrap">
+                <img class="nav-logo" src="/images/logo.png" alt="we are brent logo" />
+                <a href="/"><span>we are <span>brent</span>.</span></a>
+            </div>
+
+            <nav class="nav">
+                <ul class="nav__list">
+                    <li><a class="nav__link " href="/about"><span>about</span></a></li>
+                    <li><a class="nav__link " href="/portfolio"><span>portfolio</span></a></li>
+                    <li><a class="nav__link " href="/resume"><span>resume</span></a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="container main-container">
+            <h1 class="page-heading">
+    $ cat ./portfolio
+</h1>
+
+<div class="page-meta margin-b--m">
+    <p class="page-meta__title">A Case for Another Framework: (Part 2) The Application Class</p>
+    <p class="page-meta__date">Created at: July 2nd 2022</p>
+</div>
+
+<section class="page-content fs--m">
+    <section class="page-content__subsect">
     <h2 class="page-content__subsect-title">introduction</h2>
 
     <div class="page-content__sebsect-content">
-        <p>As introduced (<a href="{{ '/portfolio/a_case_for_a_new_framework/' | url }}">here</a>), I will be walking through my process and reasonings behind those processes for creating my own PHP framework. The attempt is to create code that's easy to read, debug and dive into without needing a lengthy manual. The hope of this project is to not only increase my knowledge of PHP development, but to also create a viable framework that puts speed, security and functionality above syntactic sugar. In this post, we'll be going over the front controller and overall Application class setup. I'll walk you through how I'm instantiating the "app" and how the Application class boots up to store all of the data and functionality needed to run the application code. I give you, the "Nebula" framework. I know there are already frameworks of various code out there that is using the "Nebula" name but hey, I like physics and I'm not marketing this thing.</p>
+        <p>As introduced (<a href="/portfolio/a_case_for_a_new_framework/">here</a>), I will be walking through my process and reasonings behind those processes for creating my own PHP framework. The attempt is to create code that's easy to read, debug and dive into without needing a lengthy manual. The hope of this project is to not only increase my knowledge of PHP development, but to also create a viable framework that puts speed, security and functionality above syntactic sugar. In this post, we'll be going over the front controller and overall Application class setup. I'll walk you through how I'm instantiating the "app" and how the Application class boots up to store all of the data and functionality needed to run the application code. I give you, the "Nebula" framework. I know there are already frameworks of various code out there that is using the "Nebula" name but hey, I like physics and I'm not marketing this thing.</p>
     </div>
 </section>
 
@@ -250,3 +279,17 @@ formattedDate: July 2nd 2022
 <p>Let's stop here for now as this is getting a little long-winded. In the next post, we'll explore the remaining Application class setup at a high level.</p>
 
 <p>You can check out the framework here: <a href="https://github.com/dithidi/nebula_php_framework" target="_blank">https://github.com/dithidi/nebula_php_framework</a></p>
+
+
+    
+    
+
+    <div class="page__prev-next-container">
+        <div>Previous: <a class="post-link" href="/portfolio/a_case_for_a_new_framework/">A Case for Another Framework: (Part 1) Introduction</a></div>
+        <div>Next: <a class="post-link" href="/portfolio/a_case_for_a_new_framework_part_3/">A Case for Another Framework: (Part 3) The Application Class</a></div>
+    </div>
+</section>
+
+        </div>
+    </body>
+</html>

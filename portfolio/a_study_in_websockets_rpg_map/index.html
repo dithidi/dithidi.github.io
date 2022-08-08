@@ -1,11 +1,40 @@
----
-tags: post
-layout: post
-title: "A Study in Websockets: Building an RPG Map"
-date: 2022-07-09
-formattedDate: July 9th 2022
----
-<section class="page-content__subsect">
+<html class="main-html">
+    <head>
+        <title>A Study in Websockets: Building an RPG Map [object Object]</title>
+        <link rel="stylesheet" href=" /dist/css/app.css" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Press+Start+2P&family=Roboto:ital,wght@0,300;0,400;1,100;1,400&display=swap" rel="stylesheet">
+    </head>
+
+    <body class="main-body">
+        <div class="main-header">
+            <div class="main-header__logo-wrap">
+                <img class="nav-logo" src="/images/logo.png" alt="we are brent logo" />
+                <a href="/"><span>we are <span>brent</span>.</span></a>
+            </div>
+
+            <nav class="nav">
+                <ul class="nav__list">
+                    <li><a class="nav__link " href="/about"><span>about</span></a></li>
+                    <li><a class="nav__link " href="/portfolio"><span>portfolio</span></a></li>
+                    <li><a class="nav__link " href="/resume"><span>resume</span></a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="container main-container">
+            <h1 class="page-heading">
+    $ cat ./portfolio
+</h1>
+
+<div class="page-meta margin-b--m">
+    <p class="page-meta__title">A Study in Websockets: Building an RPG Map</p>
+    <p class="page-meta__date">Created at: July 9th 2022</p>
+</div>
+
+<section class="page-content fs--m">
+    <section class="page-content__subsect">
     <h2 class="page-content__subsect-title">introduction</h2>
 
     <div class="page-content__sebsect-content">
@@ -35,3 +64,17 @@ formattedDate: July 9th 2022
 <p>The data structure for the RPG is complex (as expected) but easily manageable using a custom CMS admin section that I constructed. Within the admin, a user can add/edit NPCs, species and most importantly here - maps. To represent a map, a <code class="inline-code">maps</code> table was used in MariaDB. Each map has a "has many" relationship to coordinates (<code class="inline-code">coordinates</code> table). Coordinates are represent in the image above by a single grid space. Each grid space can also house information about itself (what type of terrain, part of a town?, etc.) but that is beyond the scope of this entry.</p>
 
 <p>Aside from the map itself, other data structures existed in the game world also relies to some degree on the maps. For example, when an NPC is created in admin, that is simply a static data model. An NPC by itself does not exist in the game world. To exist, an NPC must be spawned. Each spawn is a representation of an NPC and could vary in map positioning, strength and other abilities.</p>
+
+
+    
+    
+
+    <div class="page__prev-next-container">
+        <div>Previous: <a class="post-link" href="/portfolio/a_recipe_cms/">A Recipe CMS: A Practical Framework Example</a></div>
+        
+    </div>
+</section>
+
+        </div>
+    </body>
+</html>
