@@ -1,0 +1,80 @@
+<html class="main-html">
+    <head>
+        <title>A Study in Websockets: Building an RPG Map [object Object]</title>
+        <link rel="stylesheet" href=" /dist/css/app.css" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Press+Start+2P&family=Roboto:ital,wght@0,300;0,400;1,100;1,400&display=swap" rel="stylesheet">
+    </head>
+
+    <body class="main-body">
+        <div class="main-header">
+            <div class="main-header__logo-wrap">
+                <img class="nav-logo" src="/images/logo.png" alt="we are brent logo" />
+                <a href="/"><span>we are <span>brent</span>.</span></a>
+            </div>
+
+            <nav class="nav">
+                <ul class="nav__list">
+                    <li><a class="nav__link " href="/about"><span>about</span></a></li>
+                    <li><a class="nav__link " href="/portfolio"><span>portfolio</span></a></li>
+                    <li><a class="nav__link " href="/resume"><span>resume</span></a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="container main-container">
+            <h1 class="page-heading">
+    $ cat ./portfolio
+</h1>
+
+<div class="page-meta margin-b--m">
+    <p class="page-meta__title">A Study in Websockets: Building an RPG Map</p>
+    <p class="page-meta__date">Created at: July 9th 2022</p>
+</div>
+
+<section class="page-content fs--m">
+    <section class="page-content__subsect">
+    <h2 class="page-content__subsect-title">introduction</h2>
+
+    <div class="page-content__sebsect-content">
+        <p>One thing I enjoy doing in my free time is game development. At first, I was really into Unity and Unreal and diving deep into 3D modeling to make my dreams a reality. However, over the past few years it occurred to me that I could create the RPG games that I love in the tech stack I know best. I set off at once with my friend to create a web-based text RPG in the spirit of MUDs but with a more browser-based feel. Since the beginning, we've actually gone through several iterations of attempts but have never completed a fully releasable games due to outside time requirements. The last iteration I began using my own PHP framework, and the results were amazing. I decided to use this opportunity to learn Docker which has also been a life changing experience. I now have a game-server Docker container with a role playing game application. One thing I always wanted to perfect was real-time data flow from the server to the end user. An interactive RPG map was the ideal testing ground to implement websockets.</p>
+    </div>
+</section>
+
+<div class="page__left-divider"></div>
+
+<h3 class="post__sub-heading">The Map: It Lives!</h3>
+
+<div class="page-columns">
+    <figure class="inline-block">
+        <img class="margin-b--s" src="/images/rpg-map/map-movement.gif" alt="The rpg map with enemy and player movement." \>
+        <figcaption>The RPG map with enemy and player movement.</figcaption>
+    </figure>
+
+    <p>Similar to MUDs where your character is identified by basically a dot in some surrounding (usually made up of text to look like dungeon walls, etc.), I wanted my RPG map to show a player's position in addition to any enemy positions around them. My goal for the game was the make it as real-time as possible with immediate server feedback. In this light, it would have the feeling of a true RPG that lives and breathes.</p>
+
+    <p>I decided that the map will always be visible on the player's dashboard screen. This way the player knows exactly where they are in the game and that will help root them in the gameplay experience. For the prototype (see animated image), the white dot represents the player's position and any red dots represent enemies at that location. The player is able to move in a grid-like pattern in North, South, East and West directions. Enemy positions are handled using websockets and javascript to constantly keep their positioning in sync with the server.</p>
+
+    <p>Let's begin to break down the image you are currently seeing into its fundamental parts. We'll then look at each of those parts in-depth to visualize my thought process behind the setup. Let's go!</p>
+</div>
+
+<h3 class="post__sub-heading">The Data Structure</h3>
+
+<p>The data structure for the RPG is complex (as expected) but easily manageable using a custom CMS admin section that I constructed. Within the admin, a user can add/edit NPCs, species and most importantly here - maps. To represent a map, a <code class="inline-code">maps</code> table was used in MariaDB. Each map has a "has many" relationship to coordinates (<code class="inline-code">coordinates</code> table). Coordinates are represent in the image above by a single grid space. Each grid space can also house information about itself (what type of terrain, part of a town?, etc.) but that is beyond the scope of this entry.</p>
+
+<p>Aside from the map itself, other data structures existed in the game world also relies to some degree on the maps. For example, when an NPC is created in admin, that is simply a static data model. An NPC by itself does not exist in the game world. To exist, an NPC must be spawned. Each spawn is a representation of an NPC and could vary in map positioning, strength and other abilities.</p>
+
+
+    
+    
+
+    <div class="page__prev-next-container">
+        <div>Previous: <a class="post-link" href="/portfolio/a_recipe_cms/">A Recipe CMS: A Practical Framework Example</a></div>
+        
+    </div>
+</section>
+
+        </div>
+    </body>
+</html>

@@ -1,0 +1,295 @@
+<html class="main-html">
+    <head>
+        <title>A Case for Another Framework: (Part 3) The Application Class [object Object]</title>
+        <link rel="stylesheet" href="/dist/css/app.css" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Press+Start+2P&family=Roboto:ital,wght@0,300;0,400;1,100;1,400&display=swap" rel="stylesheet">
+    </head>
+
+    <body class="main-body">
+        <div class="main-header">
+            <div class="main-header__logo-wrap">
+                <img class="nav-logo" src="/images/logo.png" alt="we are brent logo" />
+                <a href="/"><span>we are <span>brent</span>.</span></a>
+            </div>
+
+            <nav class="nav">
+                <ul class="nav__list">
+                    <li><a class="nav__link " href="/about"><span>about</span></a></li>
+                    <li><a class="nav__link " href="/portfolio"><span>portfolio</span></a></li>
+                    <li><a class="nav__link " href="/resume"><span>resume</span></a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="container main-container">
+            <h1 class="page-heading">
+    $ cat ./portfolio
+</h1>
+
+<div class="page-meta margin-b--m">
+    <p class="page-meta__title">A Case for Another Framework: (Part 3) The Application Class</p>
+    <p class="page-meta__date">Created at: July 2nd 2022</p>
+</div>
+
+<section class="page-content fs--m">
+    <section class="page-content__subsect">
+    <h2 class="page-content__subsect-title">introduction</h2>
+
+    <div class="page-content__sebsect-content">
+        <p>As introduced (<a href="/portfolio/a_case_for_a_new_framework/">here</a>), I will be walking through my process and reasonings behind those processes for creating my own PHP framework. The attempt is to create code that's easy to read, debug and dive into without needing a lengthy manual. The hope of this project is to not only increase my knowledge of PHP development, but to also create a viable framework that puts speed, security and functionality above syntactic sugar. In this post, we'll be going over the front controller and overall Application class setup. I'll walk you through how I'm instantiating the "app" and how the Application class boots up to store all of the data and functionality needed to run the application code. I give you, the "Nebula" framework. I know there are already frameworks of various code out there that is using the "Nebula" name but hey, I like physics and I'm not marketing this thing.</p>
+    </div>
+</section>
+
+<div class="page__left-divider"></div>
+
+<h3 class="post__sub-heading">The Front Controller</h3>
+
+<div class="page-columns">
+    <p>The front controller is the entry point into your web-facing PHP application. Usually tucked away in public/index.php, this little file shouldn't contain much. What it should do instead, is instantiate your application and boot the system up. In some frameworks this file is cumbersome and when looking at some legacy code, the tendency is to usually stuff as much as humanly possible into the front controller. In fact, it's entirely possible to run your entire application directly from index.php...but don't do that.</p>
+</div>
+
+<pre>
+    <code>
+    &lt;?php
+
+    use Nebula\Application;
+    use Nebula\Http\{ Request, RequestResolver };
+
+    // Register the Composer autoloader
+    require __DIR__.'/../vendor/autoload.php';
+
+    // Initialize the application
+    $application = new Application(realpath(__DIR__ . '/..'));
+
+    return $application
+        ->classes[RequestResolver::class]
+        ->resolveRequest(Request::capture());
+    </code>
+</pre>
+
+<p>Let's digest the above piece by piece shall we? The first two lines are bringing in the namespaces for the necessary classes. This makes it to where we can easily use "Application" in the code without listing the fully qualified namespace of the class. Easy stuff. The line <code class="inline-code">require __DIR__.'/../vendor/autoload.php';</code> is simply pulling in composer. Again...nothing special. The next lines are where the magic happens, and magic it definitely looks like right? The next few lines of code basically runs an entire application. <code class="inline-code">$application = new Application(realpath(__DIR__ . '/..'));</code> instantiates the Application class and passes in the root path of the application (this is important for the app in order to know where things are at any given point in the file structure - more on that later). There is a great deal going on behind the scenes here that we'll get to in a moment. Finally, the last line of code resolves the request and returns the results to the end user. Easy right? Let's dive into the Application class now.</p>
+
+<h3 class="post__sub-heading">The Application Class</h3>
+
+<p>The Application class may seem formidable, but do not despair. It's currently only 139 lines long and wraps everything up quite nicely. The constructor is where most of the magic happens here so let's start there. Remember we passed in the root path? That comes into play now. I'll post the entire constructor to get us started.</p>
+
+<pre>
+    <code>
+    /**
+     * Create a new class instance.
+     *
+     * @param string $basePath The base path for the application.
+     * @param bool $isConsoleApp Indicates whether the app is in console mode.
+     * @return void
+     */
+    public function __construct(string $basePath, $isConsoleApp = false)
+    {
+        $this->setAppInstance();
+
+        $this->setAppPaths($basePath);
+
+        // Get configuration
+        if (file_exists(storage_path('framework/cache/config.json'))) {
+            // Get config directly from JSON file if present
+            $appConfig = json_decode(file_get_contents(storage_path('framework/cache/config.json')), true);
+
+            if (!defined('CONFIG_CACHE')) {
+                define('CONFIG_CACHE', true);
+            }
+        } else {
+            // Initialize env handler
+            $dotenv = new Dotenv();
+            $dotenv->load(base_path('.env'));
+
+            if (!defined('CONFIG_CACHE')) {
+                define('CONFIG_CACHE', false);
+            }
+
+            $appConfig = include(base_path('config/config.php'));
+        }
+
+        if ($isConsoleApp) {
+            // Set runningInConsole flag to true
+            $appConfig['runningInConsole'] = true;
+        }
+
+        $this->config = $appConfig;
+
+        // Register App class instances
+        $this->classes[Logger::class] = new Logger($this->config['logging']);
+        $this->classes[ExceptionHandler::class] = new ExceptionHandler($this->classes[Logger::class]);
+        $this->classes[Validator::class] = new Validator();
+
+        // Initialize the database connection manager and query builder
+        $this->classes[DatabaseManager::class] = new DatabaseManager();
+        $this->classes[QueryBuilder::class] = new QueryBuilder($this->classes[DatabaseManager::class]->getPdo());
+
+        // Initialize the Session Manager
+        $this->classes[SessionManager::class] = new SessionManager($this->config['session'], $this->classes[DatabaseManager::class]->getPdo());
+
+        // Initialize the Auth Manager
+        $this->classes[AuthManager::class] = new AuthManager($this->config['auth'], $this->classes[DatabaseManager::class]->getPdo());
+
+        $this->classes[HttpKernel::class] = new HttpKernel();
+        $this->classes[Router::class] = new Router();
+        $this->classes[RequestResolver::class] = new RequestResolver();
+        $this->classes[Response::class] = new Response();
+
+        // Start the Cache Manager
+        $this->classes[CacheManager::class] = new CacheManager($this->config['cache']);
+
+        // Build the routes
+        $this->classes[Router::class]->buildRoutes();
+    }
+    </code>
+</pre>
+
+<p>Let's look at the following line: <code class="inline-code">$this->setAppInstance();</code>. The sole purpose of this line is to set the current instance of the application to a static variable that can be easily accessed from anywhere. This will allow us to "get" the app instance whenever we want. I'll post the getter and setter below:</p>
+
+<pre>
+    <code>
+    /**
+     * Returns the current application instance.
+     *
+     * @return \Nebula\Application
+     */
+    public static function getAppInstance()
+    {
+        return static::$instance;
+    }
+
+    /**
+     * Sets the current application instance as a static variable.
+     *
+     * @return void
+     */
+    protected function setAppInstance()
+    {
+        static::$instance = $this;
+    }
+    </code>
+</pre>
+
+<p>There is actually a little more going on here. Why am I setting it this way? To answer that question we need to look at the global helpers that come along with the framework (these can be found at Helpers/BaseHelper.php).</p>
+
+<pre>
+    <code>
+    if (!function_exists('app')) {
+        /**
+        * Gets access to the current application instance.
+        *
+        * @return \Nebula\Application
+        */
+        function app()
+        {
+            return Application::getAppInstance();
+        }
+    }
+    </code>
+</pre>
+
+<p>You can see here that we now have a global helper method called 'app' that we can call anywhere in the code. This method fetches the current instance of the application. Moving onto the next line of the Application class (<code class="inline-code">$this->setAppPaths($basePath);</code>), we can see that we are utilizing the <code class="inline-code">$basePath</code> variable that we got from instantiating our class. Here, we are setting the paths to various application locations that will also be used by our helper functions.</p>
+
+<pre>
+    <code>
+    ##### Application.php #####
+
+    /**
+     * Sets the application paths.
+     *
+     * @param string $basePath The base application root path.
+     * @return void
+     */
+    protected function setAppPaths($basePath)
+    {
+        $this->paths['base'] = "$basePath/";
+        $this->paths['storage'] = "$basePath/storage/";
+        $this->paths['assets'] = "$basePath/resources/";
+    }
+
+    ##### Helpers/BaseHelper.php #####
+
+    if (!function_exists('assets_path')) {
+        /**
+        * Gets the assets/resources path.
+        *
+        * @param $string The optional sub path string.
+        * @return mixed
+        */
+        function assets_path($query = null)
+        {
+            $path = app()->paths['assets'];
+
+            if (!empty($query)) {
+                $path .= $query;
+            }
+
+            return $path;
+        }
+    }
+
+    if (!function_exists('base_path')) {
+        /**
+        * Gets the base path.
+        *
+        * @param $string The optional sub path string.
+        * @return mixed
+        */
+        function base_path($query = null)
+        {
+            $path = app()->paths['base'];
+
+            if (!empty($query)) {
+                $path .= $query;
+            }
+
+            return $path;
+        }
+    }
+
+    if (!function_exists('storage_path')) {
+        /**
+        * Gets the storage path.
+        *
+        * @param $string The optional sub path string.
+        * @return mixed
+        */
+        function storage_path($query = null)
+        {
+            if (empty(app())) {
+                return null;
+            }
+
+            $path = app()->paths['storage'];
+
+            if (!empty($query)) {
+                $path .= $query;
+            }
+
+            return $path;
+        }
+    }
+    </code>
+</pre>
+
+<p>Now we have global helpers that will allow us to access some various app paths from anywhere in the application! For example, if we wanted to store something down in a storage folder, we could simply access that path by doing something like <code class="inline-code">storage_path('/nested/folder')</code>. Cool right!? These helpers work by simply accessing the public 'paths' array on the application and appending on any sub-structure that is passed into the helper method. We are cooking now!</p>
+
+<p>Let's stop here for now as this is getting a little long-winded. In the next post, we'll explore the remaining Application class setup at a high level.</p>
+
+<p>You can check out the framework here: <a href="https://github.com/dithidi/nebula_php_framework" target="_blank">https://github.com/dithidi/nebula_php_framework</a></p>
+
+
+    
+    
+
+    <div class="page__prev-next-container">
+        <div>Previous: <a class="post-link" href="/portfolio/a_case_for_a_new_framework_part_2/">A Case for Another Framework: (Part 2) The Application Class</a></div>
+        <div>Next: <a class="post-link" href="/portfolio/a_recipe_cms/">A Recipe CMS: A Practical Framework Example</a></div>
+    </div>
+</section>
+
+        </div>
+    </body>
+</html>
