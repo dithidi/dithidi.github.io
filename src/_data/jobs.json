@@ -1,0 +1,66 @@
+[
+    {
+        "company": "Abenity Inc.",
+        "titles": [
+            {
+                "title": "Manager of Product Developement and Engineering",
+                "from": "November 2020",
+                "to": "Current"
+            },
+            {
+                "title": "Lead Backend Developer",
+                "from": "November 2019",
+                "to": "November 2020"
+            },
+            {
+                "title": "Backend Developer",
+                "from": "November 2017",
+                "to": "November 2019"
+            }
+        ],
+        "description": "Since my love of backend development was strong, I decided to switch my focus and joined Abenity as the sole backend developer alongside the CIO. When I arrived, Abenity was in a legacy state with older PHP code and very little object oriented structure. I made a plan to implement Laravel across all of the applications (7 in total) which was a monumental task in and of itself. I became solely responsible for the entire backend codebase and database structure and have implemented everything from payment processing to a custom mailing editor. I have gained extensive experience implementing API integrations with third parties and have become quite adept at devops. During my time here, I have received 2 promotions. The first was when we brought in a junior level backend development whom I would be managing and the second when my workload started morphing into more of an engineering manager which including completely spec'ing out projects and deciding which projects were to be worked on. During my time here, I have been exposed to HTML, CSS/SCSS, Javascript (Vanilla, VueJS), PHP, Laravel, Ruby, C#, devops (linux), MySql/MariaDB and much more."
+    },
+    {
+        "company": "ePublishing",
+        "titles": [
+            {
+                "title": "Frontend Developer",
+                "from": "November 2016",
+                "to": "November 2017"
+            },
+            {
+                "title": "Junior Frontend Developer",
+                "from": "November 2015",
+                "to": "November 2016"
+            }
+        ],
+        "description": "This was a hard lesson in learning to be a fast and efficient programmer. When I first started at ePublishing, I thought I knew what I was doing. The speed at which development moved was lightning fast and I was not familiar with it. I quickly got myself up to speed and thrived in the fast paced environment. I began doing minor bug fixes, change requests and features, but was quickly singled out to head up the new client work where I would be solely responsible for the entire frontend of new client apps and sites. When backend developers were not available, I taught myself backend development and was in love. At ePublishing, I was exposed to HTML, CSS/SCSS, Javascript (ReactJS/Vanilla JS), MySQL and Ruby on Rails."
+    },
+    {
+        "company": "RoundingWell",
+        "titles": [
+            {
+                "title": "Frontend Developer",
+                "from": "June 2015",
+                "to": "November 2015"
+            },
+            {
+                "title": "Software Quality Engineer",
+                "from": "June 2014",
+                "to": "June 2015"
+            }
+        ],
+        "description": "I was able to get brought into a small startup company thanks to my best friend that luckily saw potential in me. I began at RoundingWell as a software quality engineer and began to dive into automated testing. After awhile, I would do small frontend development tasks to get my feet wet and ultimately became a frontend developer which exposed me to writing HTML, CSS/SCSS, SQL and Javascript (backbone/marionette)."
+    },
+    {
+        "company": "OmniCell",
+        "titles": [
+            {
+                "title": "Software Quality Engineer",
+                "from": "June 2013",
+                "to": "June 2014"
+            }
+        ],
+        "description": "This was my introduction to the software development world. I had zero professional experience and this company gave me an opportunity to prove myself and to learn and grow as a budding developer. By trade, I was a manual QA tester which involved writing in-depth test cases and was responsible for testing any developer code that was slated to be published. I started shadowing senior engineers and learned the ins and outs of what they did. This was a Microsoft shop so the code was mostly SQL, Visual Basic and C#."
+    }
+]

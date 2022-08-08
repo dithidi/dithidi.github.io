@@ -1,0 +1,142 @@
+---
+tags: post
+layout: post
+title: "A Recipe CMS: A Practical Framework Example"
+date: 2022-07-05
+formattedDate: July 5th, 2022
+---
+<section class="page-content__subsect">
+    <h2 class="page-content__subsect-title">introduction</h2>
+
+    <div class="page-content__sebsect-content">
+        <p>I would now like to take a look at a practical example of my PHP framework that is covered in this series (<a href="{{ '/portfolio/a_case_for_a_new_framework/' | url }}">here</a>). This application is a recipe app that I built for my wife. I started noticing that she had about a million bookmarks of recipes saved all over her phone and computer. We love to cook in this house and my wife is a great at-home chef. I wanted to create something for her where she could compile all of the recipes she had into an easy to use space. Have you ever been to a recipe blog site? It's riddled with advertisements. Crazy modal popups everywhere. It makes the site unusable and it makes creating a dish while looking at the recipe even harder. So this site will also contain no ads. This was really my first test case for using my Nebula framework and it paid off - the site is blazing fast!</p>
+    </div>
+</section>
+
+<div class="page__left-divider"></div>
+
+<h3 class="post__sub-heading">A CMS at its Core</h3>
+
+<div class="page-columns margin-b--m">
+    <figure class="inline-block">
+        <img class="margin-b--s" src="/images/recipe-cms/login.png" alt="The login screen" \>
+        <figcaption>The recipe application's login page.</figcaption>
+    </figure>
+    <p>When you boil it down into its core components, the app is really a content management system with an additional public facing site attached to it. The application requires authentication (which I've removed registration logic since its only her using it - but let's pretend it was open to the public) where the user logs in and is presented to an entirely unique user experience based on their own data.</p>
+</div>
+
+<div class="page-columns margin-b--m">
+    <p>The user is first presented with a homepage where I've listed the latest recipes added, in addition to any current holiday recipes whose date ranges include today's date. Once the user begins navigating around the site, I like to think of it as an "interactive content management system" experience. What I mean by that is, instead of having a dedicated admin section, each recipe/tag/holiday/etc. has their own show and edit page directly in the main flow of the app. Once a user clicks on a recipe, for example, the user is taken to the "show" version of that recipe.</p>
+    <figure>
+        <img class="margin-b--s" src="/images/recipe-cms/homepage.png" alt="The homepage" \>
+        <figcaption>The recipe application's landing page.</figcaption>
+    </figure>
+    <p>Once the user is on the recipe show page, they have the option of simply clicking on the "Edit Recipe" link at the top of the page to enter editing mode. This opens up all fields to be in an editable state and allows the user to change anything they would like. The CMS is built with editable Tags, Recipes, and Holidays along with supporting 'favorite' recipes that can be quick accessed via the main menu.</p>
+    <figure>
+        <img class="margin-b--s" src="/images/recipe-cms/recipe-show.png" alt="The Recipe show page" \>
+        <figcaption>The recipe application's recipe show page.</figcaption>
+    </figure>
+</div>
+
+<h3 class="post__sub-heading">Feature Highlight: Adjustable Ingredients Form</h3>
+
+<p>One of the more thought-provoking aspects of designing something like this is getting the data structure just right. Here, a recipe has quite a few relationships. The heavy hitter relationships here are the ingredients and the steps that a recipe has. I wanted an easy way for my wife to add/remove/edit steps and ingredients without having to go to an external page to manage them like she does with tags, so I created an adjustable menu area that utilizes javascript to add and remove form elements when desired.</p>
+
+<figure>
+    <img class="margin-b--s" src="/images/recipe-cms/ingredients.png" alt="The adjustable form area." \>
+    <figcaption>The adjustable form area.</figcaption>
+</figure>
+
+<p>To accomplish this, an <code class="inline-code">AddNew</code> js class was created.</p>
+
+<pre>
+    <code>
+    {{'export default class AddNew {
+        constructor(button, container, type = "step") {
+            this.container = container;
+            this.type = type;
+            this.newCounter = 1;
+            this.counterPrefix = "n";
+
+            button.addEventListener("click", this.addStepRow.bind(this));
+        }
+
+        addStepRow(evt) {
+            evt.preventDefault();
+            let newContent = "";
+
+            if (this.type == "step") {
+                newContent = `
+                    <div class="flex mb-4">
+                        <input
+                            class="shadow appearance-none w-1/5 border self-baseline rounded mr-4 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            name="step_${this.counterPrefix}${this.newCounter}_order_index" type="number" min="1" max="30" autofocus value="" />
+                        <textarea
+                            class="resize-none shadow appearance-none border rounded flex-1 py-2 px-3 mr-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            name="step_${this.counterPrefix}${this.newCounter}_description" rows="5" autofocus placeholder="Step Description"></textarea>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 stroke-current text-red-800 hover:text-red-500 duration-200 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor" onclick="removeSelf(this)">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </div>
+                `;
+            } else {
+                newContent = `
+                    <div class="flex mb-4">
+                        <input
+                            class="shadow appearance-none w-1/5 border self-baseline rounded mr-4 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            name="ingredient_${this.counterPrefix}${this.newCounter}_amount" type="text" autofocus value="" />
+                        <input
+                            class="shadow appearance-none border rounded flex-1 py-2 px-3 mr-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            name="ingredient_${this.counterPrefix}${this.newCounter}_description" autofocus placeholder="Ingredient Description" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 stroke-current text-red-800 hover:text-red-500 duration-200 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor" onclick="removeSelf(this)">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </div>
+                `;
+            }
+
+            this.newCounter++;
+            this.container.insertAdjacentHTML("beforeend", newContent);
+        }
+    };'}}
+    </code>
+</pre>
+
+<div class="page-columns">
+    <p>To handle the initial display of the ingredients, we simply loop through the data structure and add the same template per entry:</p>
+</div>
+
+<pre>
+    <code>
+    {{'<h1 class="text-xl md:text-2xl font-semibold w-full border-b-2 pb-1 mb-8 mt-8">Ingredients</h1>
+
+    <div data-element="js-ingredients-container">
+        @if (!empty($recipe) && $recipe->ingredients->isNotEmpty())
+            @foreach ($recipe->ingredients as $ingredient)
+                <div class="flex flex-col md:flex-row mb-4 item-wrapper">
+                    <input
+                        class="shadow appearance-none md:w-1/5 w-full border rounded mb-1 md:mb-0 mr-4 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        name="ingredient_{{ $ingredient->id }}_amount" type="text" required autofocus placeholder="Recipe Title" value="{{ $ingredient->amount }}" />
+                    <input
+                        class="shadow appearance-none border rounded w-full py-2 px-3 mb-1 md:mb-0 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-4"
+                        name="ingredient_{{ $ingredient->id }}_description" type="text" required autofocus placeholder="Recipe Title" value="{{ $ingredient->description }}" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 stroke-current text-red-800 hover:text-red-500 duration-200 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor" onclick="removeSelf(this)">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </div>
+            @endforeach
+        @endif
+    </div>
+
+    <a class="px-4 py-2 mt-8 rounded text-black block shadow-lg border-2 border-yellow-600 hover:border-yellow-700 focus:border-yellow-800 align-middle text-center" href="#" data-element="js-add-ingredient">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        Add New Ingredient
+    </a>'}}
+    </code>
+</pre>
+
+<p>The code here is pretty straightforward. When the class is instantiated using <code class="inline-code">new AddNew(newStepBtn, newStepContainer);</code>, the target button along with the form section container is passed into the constructor. From there, we add an event listener to the button's 'click' event to handle how we will add new form elements to the section. Each form type's (step/ingredient) element addition is handled using template literals based on their type name. The click event is responsible for appending the desired html template into the form section container. Boom - we now have an expandable form area. I must also mention that the template literals contain its own 'remove' button that handles the removal of the step/ingredient by deleting itself.</p>
+
+<p>Overall, I was happy with the outcome of this project. This was my first real attempt at creating an actual working application using my own PHP framework. The execution went lovely and it provided me with a great opportunity to keep expanding and improving the framework as I went. My wife has been using her app all year and now has over 200+ recipe entries. The site is blazing fast and I couldn't be happier with the outcome.</p>

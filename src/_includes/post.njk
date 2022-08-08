@@ -1,0 +1,24 @@
+---
+layout: main
+subtitle: {{ title }}
+---
+<h1 class="page-heading">
+    $ cat ./portfolio
+</h1>
+
+<div class="page-meta margin-b--m">
+    <p class="page-meta__title">{{ title }}</p>
+    <p class="page-meta__date">Created at: {{ formattedDate }}</p>
+</div>
+
+<section class="page-content fs--m">
+    {{ content | safe }}
+
+    {% set previousPost = collections.post | getPreviousCollectionItem(page) %}
+    {% set nextPost = collections.post | getNextCollectionItem(page) %}
+
+    <div class="page__prev-next-container">
+        {% if previousPost %}<div>Previous: <a class="post-link" href="{{ previousPost.url }}">{{ previousPost.data.title }}</a></div>{% endif %}
+        {% if nextPost %}<div>Next: <a class="post-link" href="{{ nextPost.url }}">{{ nextPost.data.title }}</a></div>{% endif %}
+    </div>
+</section>
