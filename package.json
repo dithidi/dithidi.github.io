@@ -4,9 +4,11 @@
     "private": true,
     "scripts": {
         "watch:css": "chokidar src/scss/**/*.scss -c \"npm run build:css\"",
-        "build:css": "node esbuild.css.mjs"
+        "build:css": "node esbuild.css.mjs",
+        "build": "npx @11ty/eleventy"
     },
     "devDependencies": {
+        "@11ty/eleventy": "^1.0.1",
         "chokidar-cli": "^2.1.0",
         "esbuild": "^0.11.2",
         "esbuild-plugin-glob": "^2.1.0",
