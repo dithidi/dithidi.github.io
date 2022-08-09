@@ -19,7 +19,7 @@ formattedDate: July 5th, 2022
 
 <div class="page-columns margin-b--m">
     <figure class="inline-block">
-        <img class="margin-b--s" src="/images/recipe-cms/login.png" alt="The login screen" \>
+        <img class="margin-b--s" src="{{'/images/recipe-cms/login.png' | url }}" alt="The login screen" \>
         <figcaption>The recipe application's login page.</figcaption>
     </figure>
     <p>When you boil it down into its core components, the app is really a content management system with an additional public facing site attached to it. The application requires authentication (which I've removed registration logic since its only her using it - but let's pretend it was open to the public) where the user logs in and is presented to an entirely unique user experience based on their own data.</p>
@@ -28,12 +28,12 @@ formattedDate: July 5th, 2022
 <div class="page-columns margin-b--m">
     <p>The user is first presented with a homepage where I've listed the latest recipes added, in addition to any current holiday recipes whose date ranges include today's date. Once the user begins navigating around the site, I like to think of it as an "interactive content management system" experience. What I mean by that is, instead of having a dedicated admin section, each recipe/tag/holiday/etc. has their own show and edit page directly in the main flow of the app. Once a user clicks on a recipe, for example, the user is taken to the "show" version of that recipe.</p>
     <figure>
-        <img class="margin-b--s" src="/images/recipe-cms/homepage.png" alt="The homepage" \>
+        <img class="margin-b--s" src="{{'/images/recipe-cms/homepage.png' | url }}" alt="The homepage" \>
         <figcaption>The recipe application's landing page.</figcaption>
     </figure>
     <p>Once the user is on the recipe show page, they have the option of simply clicking on the "Edit Recipe" link at the top of the page to enter editing mode. This opens up all fields to be in an editable state and allows the user to change anything they would like. The CMS is built with editable Tags, Recipes, and Holidays along with supporting 'favorite' recipes that can be quick accessed via the main menu.</p>
     <figure>
-        <img class="margin-b--s" src="/images/recipe-cms/recipe-show.png" alt="The Recipe show page" \>
+        <img class="margin-b--s" src="{{'/images/recipe-cms/recipe-show.png' | url }}" alt="The Recipe show page" \>
         <figcaption>The recipe application's recipe show page.</figcaption>
     </figure>
 </div>
@@ -43,7 +43,7 @@ formattedDate: July 5th, 2022
 <p>One of the more thought-provoking aspects of designing something like this is getting the data structure just right. Here, a recipe has quite a few relationships. The heavy hitter relationships here are the ingredients and the steps that a recipe has. I wanted an easy way for my wife to add/remove/edit steps and ingredients without having to go to an external page to manage them like she does with tags, so I created an adjustable menu area that utilizes javascript to add and remove form elements when desired.</p>
 
 <figure>
-    <img class="margin-b--s" src="/images/recipe-cms/ingredients.png" alt="The adjustable form area." \>
+    <img class="margin-b--s" src="{{'/images/recipe-cms/ingredients.png' | url }}" alt="The adjustable form area." \>
     <figcaption>The adjustable form area.</figcaption>
 </figure>
 
