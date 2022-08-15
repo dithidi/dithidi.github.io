@@ -35,3 +35,291 @@ formattedDate: July 9th 2022
 <p>The data structure for the RPG is complex (as expected) but easily manageable using a custom CMS admin section that I constructed. Within the admin, a user can add/edit NPCs, species and most importantly here - maps. To represent a map, a <code class="inline-code">maps</code> table was used in MariaDB. Each map has a "has many" relationship to coordinates (<code class="inline-code">coordinates</code> table). Coordinates are represent in the image above by a single grid space. Each grid space can also house information about itself (what type of terrain, part of a town?, etc.) but that is beyond the scope of this entry.</p>
 
 <p>Aside from the map itself, other data structures existed in the game world also relies to some degree on the maps. For example, when an NPC is created in admin, that is simply a static data model. An NPC by itself does not exist in the game world. To exist, an NPC must be spawned. Each spawn is a representation of an NPC and could vary in map positioning, strength and other abilities.</p>
+
+<figure class="inline-block">
+    <img class="margin-b--s" src="/images/rpg-map/db-structure.png" alt="The database structure for corresponding map tables." \>
+    <figcaption>The database structure for the RPG map movement.</figcaption>
+</figure>
+
+<h3 class="post__sub-heading">The Backend</h3>
+
+<div class="page-columns">
+    <p>The backend code for the map is written in PHP and utilizes my own Nebula framework. Within that framework, I have built in all of the logic necessary for running a websockets server. This logic includes the ability to subscribe to channels, subscription authentication and receiving messages from the server. I've handled this by utilizing the Ratchet WampServerInterface in PHP. The Ratchet PHP web server interface gives the developer easy access to events such as onBroadcast, onOpen, onSubscribe, etc. so that you can tease this logic apart more easily without having to write complex code.</p>
+
+    <p>Aside from this, I have created my own job queue system to which the websocket events are fired. When a job is created, an entry into the <code class="inline-code">jobs</code> table is created. A queue worker which is constantly running in the background (and set up via supervisor so the process is always functioning) will scan through the database to see if any jobs are waiting to be run. If one exists, the worker will fire off the logic held within the individual job class. In the case of a broadcast event, a <code class="inline-code">BroadcastEvent</code> class which inherits the <code class="inline-code">Job</code> functionality is used instead of a regular job.</p>
+
+    <p>The <code class="inline-code">BroadcastEvent</code> class is unique in that it utilized PHP ZMQ to connect a socket to a tcp server running in the background. The data that is pushed from the broadcast event is then JSON encoded and sent through the TCP server using a specified channel name. The last piece of the puzzle here is actually moving the spawns around the map. I could probably make an entire entry on how I've set this up, but essentially the NPC spawns are moved around the map via a cron job. Each spawn has a limited number of spaces they can travel away from their starting positions and can even travel between connecting maps!</p>
+</div>
+
+<pre>
+    <code>
+    {{"<?php
+
+    namespace Nebula\\Websockets;
+
+    use Ratchet\\ConnectionInterface;
+    use Ratchet\\Wamp\\WampServerInterface;
+    use Nebula\\Accessors\\Auth;
+    use App\\Classes\\SubscriptionManager;
+
+    class Server implements WampServerInterface {
+        /**
+        * A lookup of all the channels clients have subscribed to
+        */
+        protected $subscribedChannels = [];
+
+        public function onSubscribe(ConnectionInterface $conn, $channel)
+        {
+            $this->handleSession($conn);
+
+            if (!Auth::check() || empty(class_exists('\\App\\Classes\\Websockets\\SubscriptionManager')) || empty(\\App\\Classes\\Websockets\\SubscriptionManager::authenticate($channel))) {
+                $conn->callError($id, $channel, 'Unauthorized.')->close();
+            }
+
+            $this->subscribedChannels[$channel->getId()] = $channel;
+        }
+
+        /**
+        * Broadcasts and event with data on a channel.
+        *
+        * @param string JSON'ified string we'll receive from ZeroMQ.
+        * @return void
+        */
+        public function onBroadcast($entry)
+        {
+            $entryData = json_decode($entry, true);
+
+            // Ensure that the user is subscribed to the channel
+            if (!array_key_exists($entryData['channel'], $this->subscribedChannels)) {
+                return;
+            }
+
+            $channel = $this->subscribedChannels[$entryData['channel']];
+
+            // re-send the data to all the clients subscribed to that category
+            $channel->broadcast($entryData['data']);
+        }
+
+        public function onUnSubscribe(ConnectionInterface $conn, $topic)
+        {
+            // Handle unsubscribes here
+        }
+
+        public function onOpen(ConnectionInterface $conn)
+        {
+            logError('opened');
+            $this->handleSession($conn);
+
+            if (!Auth::check()) {
+                $conn->callError('', '', 'Unauthorized.')->close();
+            }
+        }
+
+        public function onClose(ConnectionInterface $conn)
+        {
+            logError('closed');
+        }
+
+        public function onCall(ConnectionInterface $conn, $id, $channel, array $params)
+        {
+            // In this application if clients send data it's because the user hacked around in console
+            $conn->callError($id, $channel, 'You are not allowed to make calls')->close();
+        }
+
+        public function onPublish(ConnectionInterface $conn, $channel, $event, array $exclude, array $eligible)
+        {
+            // In this application if clients send data it's because the user hacked around in console
+            $conn->close();
+        }
+
+        public function onError(ConnectionInterface $conn, \\Exception $e)
+        {
+        }
+
+        /**
+        * Handles session by using provided cookie to do a session lookup.
+        *
+        * @param \\Ratchet\\ConnectionInterface $conn The connection interface.
+        * @return void
+        */
+        private function handleSession($conn)
+        {
+            if (session_status() === PHP_SESSION_NONE) {
+                session_save_path(storage_path('framework/sessions'));
+
+                session_start();
+            }
+
+            $cookies = $conn->httpRequest->getHeader('Cookie');
+
+            // Loop through cookies to see if nebula-session exists
+            foreach ($cookies as $cookie) {
+                if (strpos($cookie, 'nebula-session') !== false) {
+                    $foundSessionCookie = explode('=', $cookie);
+                    $sessionId = $foundSessionCookie[1] ?? null;
+                    break;
+                }
+            }
+
+            if (!empty($sessionId)) {
+                try {
+                    // Set the session save path
+                    $sessionPath = storage_path('framework/sessions');
+                    $serializedData = file_get_contents($sessionPath . '/sess_$sessionId');
+
+                    // Unserialize the session data
+                    $sessionData = $this->unserializeSessionData($serializedData);
+                } catch (\\Exception $e) {
+                    throw new \\Exception($e->getMessage());
+                }
+
+                $clientIp = $conn->httpRequest->getHeader('X-Forwarded-For')[0] ?? null;
+
+                // Ensure that the ip addresses match to prevent session hijacking
+                if (empty($clientIp) || $clientIp != ($sessionData['ip'] ?? null)) {
+                    return false;
+                }
+
+                session_decode($serializedData);
+            }
+        }
+
+        /**
+        * Unserializes PHP session data.
+        *
+        * @param string $sessionData The serialized session data string.
+        * @return array
+        */
+        private function unserializeSessionData($sessionData) {
+            $method = ini_get('session.serialize_handler');
+
+            switch ($method) {
+                case 'php':
+                    return $this->unserializePhp($sessionData);
+                    break;
+                case 'php_binary':
+                    return $this->unserializePhpbinary($sessionData);
+                    break;
+                default:
+                    throw new Exception('Unsupported session.serialize_handler: ' . $method . '. Supported: php, php_binary');
+            }
+        }
+
+        /**
+        * Unserializes PHP session data using php.
+        *
+        * @param string $sessionData The serialized session data string.
+        * @return array
+        */
+        private static function unserializePhp($sessionData) {
+            $returnData = [];
+            $offset = 0;
+
+            while ($offset < strlen($sessionData)) {
+                if (!strstr(substr($sessionData, $offset), '|')) {
+                    throw new Exception('invalid data, remaining: ' . substr($sessionData, $offset));
+                }
+                $pos = strpos($sessionData, '|', $offset);
+                $num = $pos - $offset;
+                $varname = substr($sessionData, $offset, $num);
+                $offset += $num + 1;
+                $data = unserialize(substr($sessionData, $offset));
+                $returnData[$varname] = $data;
+                $offset += strlen(serialize($data));
+            }
+
+            return $returnData;
+        }
+
+        /**
+        * Unserializes PHP session data using php binary.
+        *
+        * @param string $sessionData The serialized session data string.
+        * @return array
+        */
+        private static function unserializePhpbinary($sessionData) {
+            $returnData = [];
+            $offset = 0;
+
+            while ($offset < strlen($sessionData)) {
+                $num = ord($sessionData[$offset]);
+                $offset += 1;
+                $varname = substr($sessionData, $offset, $num);
+                $offset += $num;
+                $data = unserialize(substr($sessionData, $offset));
+                $returnData[$varname] = $data;
+                $offset += strlen(serialize($data));
+            }
+
+            return $returnData;
+        }
+    }"}}
+    </code>
+</pre>
+
+<h3 class="post__sub-heading">The Frontend</h3>
+
+<p>The frontend is where the visual magic happens. The entire game is written using Vue 3, but I won't really touch on the specifics of that setup for the purpose of this article. Instead, I'll focus on the javascript that makes the websockets functionality tick. First, let's discuss the <code class="inline-code">BroadcastHandler</code> js class. I've posted the code to this simple handler below if interested. Basically, I wanted a single class to be able to handle a) the connections to the websocket server and b) the event handling for channel subscriptions. For this, I began using a fairly dated JS library called AutobahnJS. This code was actually published roughly 10 years ago, so I had to modify a great deal of some of the error handling in order to suit my needs. To accomplish this, I simply pulled down the script and copied it over to my vendor js folder as opposed to creating a new fork of the repo. I might do that someday once I have a mind to completely rewrite the logic into more of a structured format.</p>
+
+<pre>
+    <code>
+    {{'import "../vendor/ab";
+
+    export default class BroadcastHandler {
+        constructor() {
+            this.connection = null;
+
+            this.connectToWebsockets();
+        }
+
+        connectToWebsockets() {
+            this.connection = new ab.Session("wss://rpg.dev:8443/wss2/",
+                () => {
+                    this.setEventListeners();
+                },
+                () => {
+                    console.warn("WebSocket connection closed");
+                    setTimeout(() => {
+                        this.connectToWebsockets();
+                    }, 2000);
+                },
+                { "skipSubprotocolCheck": true }
+            );
+        }
+
+        setEventListeners() {
+            window.addEventListener("subscribe", ({detail}) => {
+                this.connection.subscribe(detail.channelName, function (channel, data) {
+                    detail.store.dispatch(detail.actionName, data)
+                });
+            });
+
+            window.addEventListener("unsubscribe", ({detail}) => {
+                try {
+                    this.connection.unsubscribe(detail.channelName, function (channel) {
+                        console.log("Unsubscribed to channel " + channel);
+                    });
+                } catch (error) {
+                    // TODO
+                }
+            });
+        }
+    }'}}
+    </code>
+</pre>
+
+<div class="page-columns">
+    <p>Once a new BroadcastHandler has been initialized, it will immediately attempt to connect to the specific websockets server via the constructor. In the <code class="inline-code">connectToWebsockets</code> function, Autobahn is used in order to open up a websockets session. To handle any disconnection events that may occur for any number of reasons during an end user's visit, I have included an automatic reconnection handler in the error handler that will attempt to re-connect to the websockets server every 2 seconds until a successful connection is made. This is important to always keep the end user up to date as soon as possible!</p>
+
+    <p>The event listeners are the coolest part here however I've made the code look the easiest. The function <code class="inline-code">setEventListeners</code> (which has to be called within the callback of the connections initialization) sets two global event listeners to be used at any point during a user's visit: <code class="inline-code">subscribe</code> and <code class="inline-code">unsubscribe</code>. These window-based event listeners allow the application to either subscribe or unsubscribe from a specified channel at any point. I have the subscribe set up in a way that I can pass in details that will pass in the channel name, action and the Vue store. An example use case is listed below:</p>
+</div>
+
+<pre>
+    <code>
+    {{"window.dispatchEvent(new CustomEvent('subscribe', {'detail':{'channelName':`map${mapChannelId}_spawn_positions`, 'actionName':'spawn/setSpawns', 'store':store}}))"}}
+    </code>
+</pre>
+
+<p>As you can see, the channel name we are subscribing to in the above code would be something like `map2_spawn_positions`. As an FYI, I do have authentication built into to some of these channel subscriptions. These map channels, for example, require a player to be logged in AND be on the requested map. The action name that is passed into the subscribe event is the name of the event on that particular Vue store module. The third piece of subscription data is the Vue store itself. In the above example (and looking at the BroadcastHandler code above), we can see that the Vue store sets up a subscription to the channel name with a callback where the Vue store dispatches the method with data that will be passed in from the server. Easy right? The unsubscribe event works in much the same way, so I'll avoid going into detail there.</p>
+
+<p>There you have it. A brief overview of how I've made an interactive RPG map with enemies that move around. If you are interested in any more details about this topic feel free to let me know!</p>
